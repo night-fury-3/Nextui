@@ -1,14 +1,14 @@
-const usePokemonListTs = `export type Pokemon = {
+const Pokemon = `export type Pokemon = {
   name: string;
   url: string;
-};
+};`;
 
-export type UsePokemonListProps = {
-  /** Delay to wait before fetching more items */
-  fetchDelay?: number;
-};
+const AppTs = `import {Select, SelectItem} from "@nextui-org/react";
+import {useInfiniteScroll} from "@nextui-org/use-infinite-scroll";
+import {Pokemon} from "./Pokemon";
 
-export function usePokemonList({fetchDelay = 0}: UsePokemonListProps = {}) {
+export default function App() {
+  const [isOpen, setIsOpen] = React.useState(false);
   const [items, setItems] = React.useState<Pokemon[]>([]);
   const [hasMore, setHasMore] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -24,7 +24,7 @@ export function usePokemonList({fetchDelay = 0}: UsePokemonListProps = {}) {
 
       if (offset > 0) {
         // Delay to simulate network latency
-        await new Promise((resolve) => setTimeout(resolve, fetchDelay));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 
       let res = await fetch(
@@ -63,17 +63,38 @@ export function usePokemonList({fetchDelay = 0}: UsePokemonListProps = {}) {
     loadPokemon(newOffset);
   };
 
-  return {
-    items,
+  const [, scrollerRef] = useInfiniteScroll({
     hasMore,
-    isLoading,
+    isEnabled: isOpen,
+    shouldUseLoader: false, // We don't want to show the loader at the bottom of the list
     onLoadMore,
-  };
-}
+  });
 
-`;
+  return (
+    <Select
+      className="max-w-xs"
+      isLoading={isLoading}
+      items={items}
+      label="Pick a Pokemon"
+      placeholder="Select a Pokemon"
+      scrollRef={scrollerRef}
+      selectionMode="single"
+      onOpenChange={setIsOpen}
+    >
+      {(item) => (
+        <SelectItem key={item.name} className="capitalize">
+          {item.name}
+        </SelectItem>
+      )}
+    </Select>
+  );
+}`;
 
-const usePokemonList = `export function usePokemonList({fetchDelay = 0} = {}) {
+const App = `import {Select, SelectItem} from "@nextui-org/react";
+import {useInfiniteScroll} from "@nextui-org/use-infinite-scroll";
+
+export default function App() {
+  const [isOpen, setIsOpen] = React.useState(false);
   const [items, setItems] = React.useState([]);
   const [hasMore, setHasMore] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -89,7 +110,7 @@ const usePokemonList = `export function usePokemonList({fetchDelay = 0} = {}) {
 
       if (offset > 0) {
         // Delay to simulate network latency
-        await new Promise((resolve) => setTimeout(resolve, fetchDelay));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
       }
 
       let res = await fetch(
@@ -127,22 +148,6 @@ const usePokemonList = `export function usePokemonList({fetchDelay = 0} = {}) {
     setOffset(newOffset);
     loadPokemon(newOffset);
   };
-
-  return {
-    items,
-    hasMore,
-    isLoading,
-    onLoadMore,
-  };
-};`;
-
-const App = `import {Select, SelectItem} from "@nextui-org/react";
-import {useInfiniteScroll} from "@nextui-org/use-infinite-scroll";
-import {usePokemonList} from "./usePokemonList";
-
-export default function App() {
-  const [isOpen, setIsOpen] = React.useState(false);
-  const {items, hasMore, isLoading, onLoadMore} = usePokemonList({fetchDelay: 1500});
 
   const [, scrollerRef] = useInfiniteScroll({
     hasMore,
@@ -173,12 +178,11 @@ export default function App() {
 
 const react = {
   "/App.jsx": App,
-  "/usePokemonList.js": usePokemonList,
 };
 
 const reactTs = {
-  "/App.tsx": App,
-  "/usePokemonList.ts": usePokemonListTs,
+  "/App.tsx": AppTs,
+  "/Pokemon.ts": Pokemon,
 };
 
 export default {
