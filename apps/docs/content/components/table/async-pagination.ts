@@ -13,10 +13,10 @@ export default function App() {
   const rowsPerPage = 10;
 
   const pages = useMemo(() => {
-    return data?.count ? Math.ceil(data.count / rowsPerPage) : 0;
-  }, [data?.count, rowsPerPage]);
+    return (data && data.count) ? Math.ceil(data.count/rowsPerPage) : 0;
+  }, [data, rowsPerPage]);
 
-  const loadingState = isLoading || data?.results.length === 0 ? "loading" : "idle";
+  const loadingState = isLoading || (data && data.results.length === 0) ? "loading" : "idle";
 
   return (
     <Table
@@ -36,7 +36,6 @@ export default function App() {
           </div>
         ) : null
       }
-      {...args}
     >
       <TableHeader>
         <TableColumn key="name">Name</TableColumn>
@@ -45,12 +44,12 @@ export default function App() {
         <TableColumn key="birth_year">Birth year</TableColumn>
       </TableHeader>
       <TableBody
-        items={data?.results ?? []}
+        items={data ? data.results : []}
         loadingContent={<Spinner />}
         loadingState={loadingState}
       >
         {(item) => (
-          <TableRow key={item?.name}>
+          <TableRow key={item.name}>
             {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
           </TableRow>
         )}

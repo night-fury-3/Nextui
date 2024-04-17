@@ -6,24 +6,28 @@ export default function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 
   let list = useAsyncList({
-    async load({signal, cursor}) {
-      if (cursor) {
-        setPage((prev) => prev + 1);
+    load({signal, cursor}) {
+      async function fetchData() {
+        if (cursor) {
+          setPage((prev) => prev + 1);
+        }
+
+        // If no cursor is available, then we're loading the first page.
+        // Otherwise, the cursor is the next URL to load, as returned from the previous page.
+        const res = await fetch(cursor || "https://swapi.py4e.com/api/people/?search=", {signal});
+        let json = await res.json();
+
+        if (!cursor) {
+          setIsLoading(false);
+        }
+
+        return {
+          items: json.results,
+          cursor: json.next,
+        };
       }
 
-      // If no cursor is available, then we're loading the first page.
-      // Otherwise, the cursor is the next URL to load, as returned from the previous page.
-      const res = await fetch(cursor || "https://swapi.py4e.com/api/people/?search=", {signal});
-      let json = await res.json();
-
-      if (!cursor) {
-        setIsLoading(false);
-      }
-
-      return {
-        items: json.results,
-        cursor: json.next,
-      };
+      return fetchData();
     },
   });
 

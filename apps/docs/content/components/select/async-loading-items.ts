@@ -15,7 +15,7 @@ export default function App() {
   const [offset, setOffset] = React.useState(0);
   const limit = 10; // Number of items per page, adjust as necessary
 
-  const loadPokemon = async (currentOffset: number) => {
+  async function loadPokemon(currentOffset: number) {
     const controller = new AbortController();
     const {signal} = controller;
 
@@ -101,7 +101,7 @@ export default function App() {
   const [offset, setOffset] = React.useState(0);
   const limit = 10; // Number of items per page, adjust as necessary
 
-  const loadPokemon = async (currentOffset) => {
+  async function loadPokemon(currentOffset) {
     const controller = new AbortController();
     const {signal} = controller;
 
@@ -137,7 +137,7 @@ export default function App() {
       setIsLoading(false);
     }
   };
-
+ 
   React.useEffect(() => {
     loadPokemon(offset);
   }, []);

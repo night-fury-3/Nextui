@@ -5,18 +5,23 @@ export default function App() {
   const [isLoading, setIsLoading] = React.useState(true);
 
   let list = useAsyncList({
-    async load({signal}) {
-      let res = await fetch('https://swapi.py4e.com/api/people/?search', {
-        signal,
-      });
-      let json = await res.json();
-      setIsLoading(false);
+    load({signal}) {
+      async function fetchData() {
+        let res = await fetch("https://swapi.py4e.com/api/people/?search", {
+          signal,
+        });
+        let json = await res.json();
 
-      return {
-        items: json.results,
-      };
+        setIsLoading(false);
+
+        return {
+          items: json.results
+        };
+      }
+
+      return fetchData();
     },
-    async sort({items, sortDescriptor}) {
+    sort({items, sortDescriptor}) {
       return {
         items: items.sort((a, b) => {
           let first = a[sortDescriptor.column];
