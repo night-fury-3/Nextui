@@ -6,7 +6,6 @@ import * as intlDateUtils from "@internationalized/date";
 import * as reactAriaI18n from "@react-aria/i18n";
 import * as useInfiniteScroll from "@nextui-org/use-infinite-scroll";
 import * as useAsyncList from "@react-stately/data";
-import useSWR from "swr";
 
 import {BgGridContainer} from "@/components/bg-grid-container";
 import {GradientBox, GradientBoxProps} from "@/components/gradient-box";
@@ -28,7 +27,6 @@ export const scope = {
   ...reactAriaI18n,
   ...useInfiniteScroll,
   ...useAsyncList,
-  ...useSWR,
 } as Record<string, unknown>;
 
 export const ReactLiveDemo: React.FC<ReactLiveDemoProps> = ({

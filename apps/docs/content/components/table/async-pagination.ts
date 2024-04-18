@@ -1,22 +1,32 @@
 const App = `import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Spinner, getKeyValue} from "@nextui-org/react";
-import useSWR from "swr";
-
-const fetcher = (...args) => fetch(...args).then((res) => res.json());
 
 export default function App() {
   const [page, setPage] = React.useState(1);
+  const [data, setData] = React.useState({count: 0, results: []});
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const {data, isLoading} = useSWR(\`https://swapi.py4e.com/api/people?page=\$\{page\}\`, fetcher, {
-    keepPreviousData: true,
-  });
+  React.useEffect(() => {
+    async function getData(page) {
+      const response = await fetch(\`https://swapi.py4e.com/api/people?page=\${page}\`);
+
+      return await response.json();
+    }
+
+    setIsLoading(true);
+    getData(page).then((data) => {
+      setData(data);
+      setIsLoading(false);
+    });
+  }, [page]);
 
   const rowsPerPage = 10;
 
-  const pages = useMemo(() => {
-    return (data && data.count) ? Math.ceil(data.count/rowsPerPage) : 0;
+  const pages = React.useMemo(() => {
+    return data.count ? Math.ceil(data.count / rowsPerPage) : 0;
   }, [data, rowsPerPage]);
 
-  const loadingState = isLoading || (data && data.results.length === 0) ? "loading" : "idle";
+  const loadingState =
+    isLoading || (data.results && data.results.length === 0) ? "loading" : "idle";
 
   return (
     <Table
@@ -44,7 +54,7 @@ export default function App() {
         <TableColumn key="birth_year">Birth year</TableColumn>
       </TableHeader>
       <TableBody
-        items={data ? data.results : []}
+        items={data.results}
         loadingContent={<Spinner />}
         loadingState={loadingState}
       >
